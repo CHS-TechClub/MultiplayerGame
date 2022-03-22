@@ -1,7 +1,7 @@
 const c = document.getElementById("canvas");
 const ctx = c.getContext("2d");
 const socket = io();
-let players = new Map();
+const players = new Map();
 let mainPlayer;
 
 /*
