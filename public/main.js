@@ -25,12 +25,20 @@ class Player {
     this.x = x;
   }
 
+  addX(x) {
+    this.x += x;
+  }
+
   getY() {
     return this.y;
   }
 
   setY(y) {
     this.y = y;
+  }
+
+  addY(y) {
+    this.y += y;
   }
 
   getColor() {
@@ -79,11 +87,11 @@ mainPlayer = new Player(Math.floor(Math.random() * (750 - 60 + 1) + 60), Math.fl
 Handle main player movement
 */
 document.addEventListener('keydown', (event) => {
-    if(event.keyCode == 37) {
-        alert('Left was pressed');
+    if(event.keyCode == 37 || event.keyCode == 65) {
+        mainPlayer.addX(-5); //A && left arrow
     }
-    else if(event.keyCode == 39) {
-        alert('Right was pressed');
+    else if(event.keyCode == 39 || event.keyCode == 68) {
+        mainPlayer.addX(5); //D && right arrow
     }
 });
 
@@ -95,7 +103,7 @@ setInterval(() => {
   for (const player of players.values()) {
     player.render(ctx);
   }
-}, 500);
+}, 20);
 
 /*
 Socket Stuff
