@@ -1,6 +1,7 @@
 const c = document.getElementById("canvas");
 const ctx = c.getContext("2d");
 const socket = io();
+const colors = ["red", "green", "blue", "yellow", "white", "pink", "orange"];
 const players = new Map();
 const pressedKeys = [];
 let mainPlayer;
@@ -52,6 +53,15 @@ class Player {
     return this.color;
   }
 
+  setColor(color) {
+    this.color = color;
+  }
+
+  changeColor() {
+    this.color = colors[Math.floor(Math.random() * colors.length)];
+    socket.emit("player_change_color", {color: this.color});
+  }
+
   getWidth() {
     return this.width;
   }
@@ -86,7 +96,6 @@ class Player {
 /*
 Initialize everything
 */
-let colors = ["red", "green", "blue", "yellow", "white", "pink", "orange"];
 //null id because it gets assigned by the server!
 mainPlayer = new Player(Math.floor(Math.random() * (750 - 60 + 1) + 60), Math.floor(Math.random() * (750 - 60 + 1) + 60), colors[Math.floor(Math.random() * colors.length)], null)
 
@@ -169,4 +178,9 @@ socket.on('player_move', (player) => {
   let gamePlayer = players.get(player.id);
   gamePlayer.setX(player.x);
   gamePlayer.setY(player.y);
+})
+
+socket.on('player_change_color', (player) => {
+  let gamePlayer = players.get(player.id);
+  gamePlayer.setColor(player.color);
 })

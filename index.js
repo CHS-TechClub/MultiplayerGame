@@ -42,6 +42,10 @@ function registerSocketServer() {
       socket.broadcast.emit('player_move', {id: socket.id, x: player.x, y: player.y});
     })
 
+    socket.on('player_change_color', (player) => {
+      socket.broadcast.emit('player_change_color', {id: socket.id, color: player.color});
+    })
+
     socket.on('disconnect', () => {
       let id = socket.id;
       socket.broadcast.emit('player_leave', id);
