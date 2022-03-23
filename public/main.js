@@ -2,6 +2,7 @@ const c = document.getElementById("canvas");
 const ctx = c.getContext("2d");
 const socket = io();
 const players = new Map();
+const pressedKeys = [];
 let mainPlayer;
 
 /*
@@ -27,6 +28,9 @@ class Player {
 
   addX(x) {
     this.x += x;
+    if (this.x < 0) this.setX(0);
+    if (this.x > c.width - this.getWidth()) this.setX(c.width - this.getWidth());
+    socket.emit("player_move", {x: this.getX(), y: this.getY()});
   }
 
   getY() {
@@ -39,6 +43,9 @@ class Player {
 
   addY(y) {
     this.y += y;
+    if (this.y < 0) this.setY(0);
+    if (this.y > c.height - this.getHeight()) this.setY(c.height - this.getHeight());
+    socket.emit("player_move", {x: this.getX(), y: this.getY()});
   }
 
   getColor() {
@@ -87,12 +94,16 @@ mainPlayer = new Player(Math.floor(Math.random() * (750 - 60 + 1) + 60), Math.fl
 Handle main player movement
 */
 document.addEventListener('keydown', (event) => {
-    if(event.keyCode == 37 || event.keyCode == 65) {
-        mainPlayer.addX(-5); //A && left arrow
-    }
-    else if(event.keyCode == 39 || event.keyCode == 68) {
-        mainPlayer.addX(5); //D && right arrow
-    }
+  if (pressedKeys.includes(event.keyCode)) return;
+  pressedKeys.push(event.keyCode);
+});
+
+document.addEventListener('keyup', (event) => {
+  if (!pressedKeys.includes(event.keyCode)) return;
+  let index = pressedKeys.indexOf(event.keyCode);
+  if (index > -1) {
+    pressedKeys.splice(index, 1)
+  }
 });
 
 /*
@@ -100,6 +111,29 @@ Main game loop
 */
 setInterval(() => {
   ctx.clearRect(0, 0, c.width, c.height);
+
+  //don't use else if here to allow for diagnal movement.
+
+  if (pressedKeys.includes(87) || pressedKeys.includes(38)) {
+    //W & up arrow
+    mainPlayer.addY(-5);
+  }
+
+  if (pressedKeys.includes(65) || pressedKeys.includes(37)) {
+    //A && left arrow
+    mainPlayer.addX(-5);
+  }
+
+  if (pressedKeys.includes(83) || pressedKeys.includes(40)) {
+    //S && down arrow
+    mainPlayer.addY(5);
+  }
+
+  if (pressedKeys.includes(68) || pressedKeys.includes(39)) {
+    //D && right arrow
+    mainPlayer.addX(5);
+  }
+
   for (const player of players.values()) {
     player.render(ctx);
   }
@@ -129,4 +163,10 @@ socket.on('player_join', (player) => {
 
 socket.on('player_leave', (id) => {
   players.delete(id);
+})
+
+socket.on('player_move', (player) => {
+  let gamePlayer = players.get(player.id);
+  gamePlayer.setX(player.x);
+  gamePlayer.setY(player.y);
 })

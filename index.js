@@ -38,6 +38,10 @@ function registerSocketServer() {
       socket.emit('send_players', {playerData: playersData});
     })
 
+    socket.on('player_move', (player) => {
+      socket.broadcast.emit('player_move', {id: socket.id, x: player.x, y: player.y});
+    })
+
     socket.on('disconnect', () => {
       let id = socket.id;
       socket.broadcast.emit('player_leave', id);
