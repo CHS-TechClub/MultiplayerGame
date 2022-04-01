@@ -93,20 +93,17 @@ class Player {
 
 }
 
-/*
-Initialize everything
-*/
 //null id because it gets assigned by the server!
 mainPlayer = new Player(Math.floor(Math.random() * (750 - 60 + 1) + 60), Math.floor(Math.random() * (750 - 60 + 1) + 60), colors[Math.floor(Math.random() * colors.length)], null)
 
-/*
-Handle main player movement
-*/
+//add key codes to list, this checking keys in the list on each render-cycle is faster than waiting for the browser to emit the event
 document.addEventListener('keydown', (event) => {
+  if (event.keyCode == 32) mainPlayer.changeColor(); // allow the user to sparingly change the color (if this is in the key loops they change like 5 colors at a time)
   if (pressedKeys.includes(event.keyCode)) return;
   pressedKeys.push(event.keyCode);
 });
 
+//remove key codes from list
 document.addEventListener('keyup', (event) => {
   if (!pressedKeys.includes(event.keyCode)) return;
   let index = pressedKeys.indexOf(event.keyCode);
@@ -143,6 +140,7 @@ setInterval(() => {
     mainPlayer.addX(5);
   }
 
+  //render all the players in the map
   for (const player of players.values()) {
     player.render(ctx);
   }
